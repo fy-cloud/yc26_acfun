@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 命名空间与映射接口的全类名一致 -->
+<mapper namespace="com.yc.acfun.mapper.UserMapper">
+	<insert id="reg" parameterType="User">
+		insert into user(user_nickname,user_password,user_telephone,user_time,user_head)  
+		values(#{user_nickname},#{user_password},#{user_telephone},NOW(),'/acfun/images/avatar.jpg')
+	</insert>
+	<select id="checkTel" resultType="int" parameterType="java.lang.String">
+		select count(user_id) from user where user_telephone=#{tel}
+	</select>
+	
+	<select id="checkUname" resultType="int" parameterType="java.lang.String">
+		select count(user_id) from user where user_nickname=#{name}
+	</select>
+	
+	
+	
+	<select id="login" resultType="Integer">
+		select user_id from user where (user_nickname = #{name} and user_password=#{pwd}) or (user_telephone = #{name} and user_password=#{pwd})
+	</select>
+	
+	<select id="selectUser" parameterType="int" resultType="User">
+		select * from user where user_id = #{userId}
+	</select>
+	
+	<select id="showUserbyId" parameterType="int" resultType="User">
+		select * from user where user_id=#{id}
+	</select>
+	
+	<update id="EditAutograph" parameterType="User">
+		update user set user_autograph=#{user_autograph} where user_id=#{user_id}
+	</update>
+	
+	<update id="updateUser" parameterType="User">
+		update user set user_sex=#{user_sex},user_name=#{user_name},user_email=#{user_email},user_telephone=#{user_telephone},user_address=#{user_address},user_qq=#{user_qq} where user_id=#{user_id}
+	</update>
+	
+	<update id="updatePassword" parameterType="User">
+		update user set user_password=#{user_password} where user_id=#{user_id}
+	</update>
+	
+	
+	<select id="findPassword" parameterType="User" resultType="int">
+		select count(1) from user where user_id=#{user_id} and user_password=#{user_password}
+	</select>
+	
+	<update id="updateEmail" parameterType="java.util.Map">
+		update user set user_email=#{email} where user_id=#{id}
+	</update>
+	
+	<select id="countFollow" parameterType="int" resultType="int">
+		select count(1) from follow where user_id=#{id}
+	</select>
+	
+	<update id="updateKey">
+		update user set auth_key = #{key} where user_id = #{id}
+	</update>
+	<select id="selectUserByName" parameterType="java.lang.String" resultType="User">
+		select * from user where user_nickname = #{user_nickname}
+	</select>
+	
+	<select id="selectsplashinfo" parameterType="int" resultType="Splash">
+		select * from (select count(1) followme from follow where mefollow_id=#{id} )a,
+		(select count(1) message from message where receive_id=#{id})b,
+		(select distinct #{id} user_id,user_head from user where user_id=#{id})c,
+		(select count(1) resource from resource where user_id=#{id})d,
+		(select count(1) collection from collection where user_id=#{id})e,
+		(select sum(resource_click) resource_click from resource where user_id=#{id})f,
+		(select count(comment_id) comment from comment c,resource r where r.resource_id=c.resource_id and r.user_id=#{id})g,
+		(select count(resource_id) allresource from resource where resource_state=1 and user_id=#{id})h,
+		(select count(1) mefollow from follow where user_id=#{id})i
+	</select>
+	
+	
+	<update id="updateHead" parameterType="User">
+		update user set user_head=#{user_head} where user_id=#{user_id}
+	</update>
+</mapper>
